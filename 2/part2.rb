@@ -1,7 +1,5 @@
 require 'byebug'
 
-# Battlehardened legacy jacket
-
 SAMPLE_FILE = 'sample.txt'
 INPUT_FILE = 'input.txt'
 

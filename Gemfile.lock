@@ -4,6 +4,7 @@ GEM
     byebug (11.1.3)
 
 PLATFORMS
+  arm64-darwin-23
   x64-mingw-ucrt
 
 DEPENDENCIES
