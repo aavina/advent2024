@@ -3,7 +3,89 @@ require 'byebug'
 SAMPLE_FILE = 'sample.txt'
 INPUT_FILE = 'input.txt'
 
-data = File.open(SAMPLE_FILE, 'r') do |f|
+class Multiplier
+  TRACK_CHARS = 'mul('
+
+  def initialize(data:)
+    @data = data
+    @total = 0
+    reset
+  end
+
+  def determine_product
+    @data.chars.each do |char|
+      case @state
+      when :finding_start
+        find_start(char:)
+      when :finding_first_num
+        find_first_number(char:)
+      when :finding_second_num
+        find_second_number(char:)
+      end
+    end
+
+    @total
+  end
+
+  private
+
+  def current_track_char
+    TRACK_CHARS[@tracker_idx]
+  end
+
+  def find_start(char:)
+    if char == current_track_char
+      @state = :finding_first_num if char == '('
+      @tracker_idx += 1
+    else
+      reset
+    end
+  end
+
+  def find_first_number(char:)
+    if char == ','
+      if @first_number == ''
+        reset
+        return
+      end
+      @state = :finding_second_num
+      return
+    end
+
+    raise ArgumentError unless ('0'..'9').include?(char)
+
+    @first_number += char
+  rescue ArgumentError
+    reset
+  end
+
+  def find_second_number(char:)
+    if char == ')'
+      if @second_number == ''
+        reset
+        return
+      end
+      @total += (@first_number.to_i * @second_number.to_i)
+      reset
+      return
+    end
+
+    raise ArgumentError unless ('0'..'9').include?(char)
+
+    @second_number += char
+  rescue ArgumentError
+    reset
+  end
+
+  def reset
+    @tracker_idx = 0
+    @state = :finding_start
+    @first_number = ''
+    @second_number = ''
+  end
+end
+
+data = File.open(INPUT_FILE, 'r') do |f|
   f.readlines
 end
 
@@ -12,58 +94,5 @@ data.each do |line|
   continuous_data += line.strip
 end
 
-puts continuous_data
-
-# :finding_start
-# :finding_numbers
-state = :finding_start
-
-track_chars = 'mul('
-current_char_idx = 0
-current_number_str = ''
-current_product = nil
-total = 0
-continuous_data.chars.each do |char|
-  current_char = track_chars[current_char_idx]
-
-  if state == :finding_numbers
-    if char == ',' or char ==')'
-      # done, create the number
-      current_number = current_number_str.to_i
-      if current_product.nil?
-        current_product = current_number
-      else
-        puts "current_number: #{current_number}"
-        current_product *= current_number
-        total += current_product
-        current_product = nil
-        state = :finding_start
-      end
-      current_char_idx = 0
-      current_number_str = ''
-    else
-      begin
-        int_char = char.to_i
-        current_number_str += char
-      rescue ArgumentError
-        state = :finding_start
-        current_char_idx = 0
-        current_number_str = ''
-      end
-    end
-    next
-  end
-
-  if char != current_char
-    current_char_idx = 0
-    current_number_str = ''
-    state = :finding_start
-  elsif char == '('
-    state = :finding_numbers
-    current_char_idx = 0
-  else
-    current_char_idx += 1
-  end
-end
-
-puts "Total: #{total}"
+multiplier = Multiplier.new(data: continuous_data)
+puts multiplier.determine_product
