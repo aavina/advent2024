@@ -12,7 +12,33 @@ data.each do |line|
   stripped_lines << line.strip
 end
 
-puts stripped_lines
+class CeresMap
+  attr_accessor :map
+
+  def initialize(lines:)
+    cols = lines.first.size
+    rows = lines.size
+    self.map = Array.new(rows) { Array.new(cols) }
+    lines.each.with_index do |line, idx|
+      self.map[idx] = line.chars
+    end
+  end
+
+  def solve
+    times_found = 0
+
+    self.map.each.with_index do |row, ridx|
+      row.each.with_index do |element, cidx|
+        puts element
+      end
+    end
+    times_found
+  end
+end
+
+ceres_map = CeresMap.new(lines: stripped_lines)
+
+puts ceres_map.solve
 
 # TODO: Everytime a `X` is found, need to check:
 # 1. right-to-left
