@@ -3,7 +3,7 @@ require 'byebug'
 SAMPLE_FILE = 'sample.txt'
 INPUT_FILE = 'input.txt'
 
-data = File.open(SAMPLE_FILE, 'r') do |f|
+data = File.open(INPUT_FILE, 'r') do |f|
   f.readlines
 end
 
@@ -25,14 +25,91 @@ class CeresMap
   end
 
   def solve
-    times_found = 0
+    hits = 0
 
     self.map.each.with_index do |row, ridx|
       row.each.with_index do |element, cidx|
-        puts element
+        hits += find_hits(y: cidx, x: ridx)
       end
     end
-    times_found
+    hits
+  end
+
+  private
+
+  def find_hits(x:, y:)
+    hits = 0
+    return 0 unless get_char(x:, y:) == 'X'
+
+    if (x + 3) < self.map[0].size 
+      if get_char(x: x+1, y:) == 'M' &&
+        get_char(x: x+2, y:) == 'A' &&
+        get_char(x: x+3, y:) == 'S'
+        hits += 1
+      end
+    end
+
+    if (x - 3) >= 0
+      if get_char(x: x-1, y:) == 'M' &&
+        get_char(x: x-2, y:) == 'A' &&
+        get_char(x: x-3, y:) == 'S'
+        hits += 1
+      end
+    end
+
+    if (y + 3) < self.map.size
+      if get_char(x: x, y: y + 1) == 'M' &&
+        get_char(x: x, y: y + 2) == 'A' &&
+        get_char(x: x, y: y + 3) == 'S'
+        hits += 1
+      end
+    end
+
+    if (y - 3) >= 0
+      if get_char(x: x, y: y - 1) == 'M' &&
+        get_char(x: x, y: y - 2) == 'A' &&
+        get_char(x: x, y: y - 3) == 'S'
+        hits += 1
+      end
+    end
+
+    if (x - 3) >= 0 && (y - 3) >= 0
+      if get_char(x: x - 1, y: y - 1) == 'M' &&
+        get_char(x: x - 2, y: y - 2) == 'A' &&
+        get_char(x: x - 3, y: y - 3) == 'S'
+        hits += 1
+      end
+    end
+
+    if (x - 3) >= 0 && (y + 3) < self.map.size
+      if get_char(x: x - 1, y: y + 1) == 'M' &&
+        get_char(x: x - 2, y: y + 2) == 'A' &&
+        get_char(x: x - 3, y: y + 3) == 'S'
+        hits += 1
+      end
+    end
+
+    if (x + 3) < self.map[0].size && (y - 3) >= 0
+      if get_char(x: x + 1, y: y - 1) == 'M' &&
+        get_char(x: x + 2, y: y - 2) == 'A' &&
+        get_char(x: x + 3, y: y - 3) == 'S'
+        hits += 1
+      end
+    end
+
+    if (x + 3) < self.map[0].size && (y + 3) < self.map.size
+      if get_char(x: x + 1, y: y + 1) == 'M' &&
+        get_char(x: x + 2, y: y + 2) == 'A' &&
+        get_char(x: x + 3, y: y + 3) == 'S'
+        hits += 1
+      end
+    end
+
+    hits
+  end
+
+  def get_char(x:, y:)
+    self.map[y][x]
   end
 end
 
